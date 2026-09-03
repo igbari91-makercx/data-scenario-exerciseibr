@@ -16,6 +16,7 @@ ORDER BY avg_first_response_minutes;
 ```
 
 ## 2. Agents with Above-Average Reopen Rates
+Assumption: I interpret the team's average as the average of the individual agent reopen rates within that team.
 
 ```sql
 WITH agent_rates AS (
@@ -58,7 +59,7 @@ SELECT
 FROM tickets t
 JOIN csat_responses c
     ON c.ticket_id = t.ticket_id
-WHERE c.submitted_at >= CURRENT_DATE - INTERVAL '3 months'
+WHERE c.submitted_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 months'
 GROUP BY
     DATE_TRUNC('month', c.submitted_at),
     t.category
@@ -90,7 +91,27 @@ GROUP BY
     END;
 ```
 
+I would also check whether the Billing reopen rate increased during the same period as the CSAT decline:
+```sql
+SELECT
+    DATE_TRUNC('month', t.opened_at) AS month,
+    SUM(CASE WHEN t.reopened_count > 0 THEN 1 ELSE 0 END) * 1.0 / COUNT(*) AS reopen_rate
+FROM tickets t
+WHERE t.category = 'Billing'
+  AND t.opened_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 months'
+GROUP BY DATE_TRUNC('month', t.opened_at)
+ORDER BY month;
+```
+
 ## 6. Acting on the Findings
-I would first validate the root cause behind the refund timing increase. If customers are currently being told that refunds take 2 business days while the actual process is taking 3, I would determine whether the delay can be resolved within Support or needs to be escalated to another internal team.
-As an immediate containment measure, I would align the team on communicating the current 3-business-day expectation so we do not continue setting an expectation we cannot meet. I would temporarily update the customer-facing macro and the internal process documentation, clearly noting that the change is temporary while the root cause is being addressed.
+I would first investigate the root cause behind the refund timing reopens. For example, if the analysis shows that customers are being told refunds take 2 business days while the actual process is taking 3, I would determine whether the delay can be resolved within Support or needs to be escalated to another internal team.
+If that timing mismatch is confirmed, as an immediate containment measure, I would align the team on communicating the current 3-business-day expectation so we do not continue setting an expectation we cannot meet. I would temporarily update the customer-facing macro and the internal process documentation, clearly noting that the change is temporary while the root cause is being addressed.
 To measure whether the intervention is working, I would monitor the reopen rate and CSAT specifically for refund timing over the following days and compare them with the previous period. I would treat the first four days as an early signal and continue monitoring into the following week to confirm that the improvement is sustained. Once the root cause is resolved and the 2-business-day timing is consistently achievable again, I would restore the original macro and process documentation and communicate the update to the team.
+
+## 7. Reporting Up and Coaching Down
+
+**Manager update:**
+We identified increased reopens in refund timing as a key driver associated with the Billing CSAT decline, with customers receiving a 2-business-day expectation while the process is currently taking 3. We have implemented temporary changes to align customer expectations and reduce further impact while we investigate the underlying cause of the delay.
+
+**Agent 1:1:**
+I noticed that some of your refund timing tickets were reopened after customers received the 2-business-day expectation, and I’d first like to understand what information or process you were following. Going forward, please use the updated 3-business-day guidance in our official channels and process documentation, and flag any conflicting information you find so I can make sure our tools and guidance stay aligned.
