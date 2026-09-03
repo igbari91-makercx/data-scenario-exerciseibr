@@ -64,3 +64,7 @@ GROUP BY
     t.category
 ORDER BY month, t.category;
 ```
+
+## 4. Digging In
+I would start with the tickets table to determine whether the Billing CSAT decline coincides with changes in first response time, resolution time, or reopen behavior.
+Beyond the existing tables, I would first want a more detailed Billing issue type or subcategory to identify whether the CSAT decline is concentrated in a specific process or issue. I would then review customer CSAT comments to understand what is failing from the customer's perspective, and finally compare those findings with QA data to validate what happened internally.
