@@ -68,3 +68,24 @@ ORDER BY month, t.category;
 ## 4. Digging In
 I would start with the tickets table to determine whether the Billing CSAT decline coincides with changes in first response time, resolution time, or reopen behavior.
 Beyond the existing tables, I would first want a more detailed Billing issue type or subcategory to identify whether the CSAT decline is concentrated in a specific process or issue. I would then review customer CSAT comments to understand what is failing from the customer's perspective, and finally compare those findings with QA data to validate what happened internally.
+
+## 5. Testing a Theory
+My theory is that some Billing tickets may be getting closed before the customer's issue is fully resolved, leading to more reopened tickets and lower CSAT. One possible driver could be pressure to meet internal SLA or closure metrics, although the existing data would not be enough to confirm that specific cause.
+
+```sql
+SELECT
+    CASE
+        WHEN t.reopened_count > 0 THEN 'Reopened'
+        ELSE 'Not Reopened'
+    END AS reopen_status,
+    AVG(c.score) AS avg_csat
+FROM tickets t
+JOIN csat_responses c
+    ON c.ticket_id = t.ticket_id
+WHERE t.category = 'Billing'
+GROUP BY
+    CASE
+        WHEN t.reopened_count > 0 THEN 'Reopened'
+        ELSE 'Not Reopened'
+    END;
+```
