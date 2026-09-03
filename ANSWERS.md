@@ -48,3 +48,20 @@ FROM rates_with_team_avg
 WHERE reopen_rate > team_avg_reopen_rate
 ORDER BY team, reopen_rate DESC;
 ```
+
+## 3. CSAT Trend by Category
+```sql
+SELECT
+    DATE_TRUNC('month', c.submitted_at) AS month,
+    t.category,
+    AVG(c.score) AS avg_csat
+FROM tickets t
+JOIN csat_responses c
+    ON c.ticket_id = t.ticket_id
+WHERE c.submitted_at >= CURRENT_DATE - INTERVAL '3 months'
+GROUP BY
+    DATE_TRUNC('month', c.submitted_at),
+    t.category
+ORDER BY month, t.category;
+```
+
