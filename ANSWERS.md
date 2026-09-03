@@ -89,3 +89,8 @@ GROUP BY
         ELSE 'Not Reopened'
     END;
 ```
+
+## 6. Acting on the Findings
+I would first validate the root cause behind the refund timing increase. If customers are currently being told that refunds take 2 business days while the actual process is taking 3, I would determine whether the delay can be resolved within Support or needs to be escalated to another internal team.
+As an immediate containment measure, I would align the team on communicating the current 3-business-day expectation so we do not continue setting an expectation we cannot meet. I would temporarily update the customer-facing macro and the internal process documentation, clearly noting that the change is temporary while the root cause is being addressed.
+To measure whether the intervention is working, I would monitor the reopen rate and CSAT specifically for refund timing over the following days and compare them with the previous period. I would treat the first four days as an early signal and continue monitoring into the following week to confirm that the improvement is sustained. Once the root cause is resolved and the 2-business-day timing is consistently achievable again, I would restore the original macro and process documentation and communicate the update to the team.
