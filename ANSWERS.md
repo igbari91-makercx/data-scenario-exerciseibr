@@ -64,4 +64,3 @@ GROUP BY
     t.category
 ORDER BY month, t.category;
 ```
-
